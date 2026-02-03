@@ -1,4 +1,21 @@
 {
   "name": "MyRNProject",
-  "displayName": "MyRNProject"
+  "displayName": "MyRNProject",
+  "expo": {
+    "name": "MyRNProject",
+    "slug": "my-rn-project",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.myrnproject"
+    },
+    "android": {
+      "package": "com.myrnproject"
+    },
+    "plugins": [],
+    "scheme": "myrnproject"
+  }
 }
