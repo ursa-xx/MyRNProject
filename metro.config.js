@@ -1,8 +1,8 @@
-const { getDefaultConfig } = require('expo/metro-config');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
 /**
- * Expo 裸工作流：使用 Expo 的 Metro 配置，提供 .expo/.virtual-metro-entry 等入口
+ * 继承 @react-native/metro-config，入口已改为 index（见 ios AppDelegate）
  */
-const config = getDefaultConfig(__dirname);
+const config = {};
 
-module.exports = config;
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);
