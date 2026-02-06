@@ -8,21 +8,38 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
+  ImageSourcePropType,
   NativeSyntheticEvent,
   NativeScrollEvent,
   LayoutChangeEvent,
 } from 'react-native';
 
 const PAGE_COUNT = 8;
+
+/** assets 下 8 张 Banner 图，与 8 页一一对应（HomeBanner 在 src/.../components/HomeBanner，需回退 4 层到 src/assets） */
+const BANNER_IMAGES: ImageSourcePropType[] = [
+  require('../../../../assets/0c40cc52cdea8bf588bfa1217df1a30f.jpg'),
+  require('../../../../assets/1f5fe7748dacca130b066f7176db3992.jpg'),
+  require('../../../../assets/88403195b0830bd40c73d9f5cb213f52.jpg'),
+  require('../../../../assets/a02a6b0f175ddfa34aca21abf04b6e2e.jpg'),
+  require('../../../../assets/b36b9c7c3718fb4aa87ab27c2a8cd32b.jpg'),
+  require('../../../../assets/b81178921b5140cecc5f3c877ddba62a.jpg'),
+  require('../../../../assets/ef00d57d27b07a283e336ceb3a85f7ed.jpg'),
+  require('../../../../assets/fd2e8d22fe4143e7c67314dd6d95c6bb.jpg'),
+];
 const TOTAL_SLIDES = PAGE_COUNT + 1; // 多一页作为“第一页”的副本，实现最后一页左滑进第一页
 const BANNER_HEIGHT = 140;
 const AUTO_PLAY_INTERVAL = 3000;
 
 export type HomeBannerProps = {
+  /** 顶部安全区高度（状态栏/灵动岛），Banner 会延伸上去与之一体 */
+  topInset?: number;
   onPagePress?: (index: number) => void;
 };
 
-export function HomeBanner({onPagePress}: HomeBannerProps) {
+export function HomeBanner({topInset = 0, onPagePress}: HomeBannerProps) {
+  const bannerHeight = BANNER_HEIGHT + topInset;
   const [layoutWidth, setLayoutWidth] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
@@ -130,17 +147,21 @@ export function HomeBanner({onPagePress}: HomeBannerProps) {
 
   if (layoutWidth <= 0) {
     return (
-      <View style={[styles.container, styles.placeholder]} onLayout={onLayout}>
-        <View style={styles.pageInner}>
-          <Text style={styles.pageText}>酒店广告 · 点击进入详情</Text>
-        </View>
+      <View
+        style={[styles.container, styles.placeholder, {height: bannerHeight}]}
+        onLayout={onLayout}>
+        <Image
+          source={BANNER_IMAGES[0]}
+          style={styles.placeholderImage}
+          resizeMode="cover"
+        />
       </View>
     );
   }
 
   return (
     <View
-      style={styles.container}
+      style={[styles.container, {height: bannerHeight}]}
       onLayout={onLayout}
       onTouchStart={onPauseAutoPlay}
       onTouchEnd={onResumeAutoPlay}>
@@ -159,9 +180,14 @@ export function HomeBanner({onPagePress}: HomeBannerProps) {
           return (
             <TouchableOpacity
               key={i}
-              style={[styles.page, {width: layoutWidth}]}
+              style={[styles.page, {width: layoutWidth, height: bannerHeight}]}
               activeOpacity={0.9}
               onPress={() => onPagePress?.(pageIndex)}>
+              <Image
+                source={BANNER_IMAGES[pageIndex]}
+                style={styles.pageImage}
+                resizeMode="cover"
+              />
               <View style={styles.pageInner}>
                 <Text style={styles.pageText}>酒店广告 · 点击进入详情</Text>
               </View>
@@ -185,26 +211,35 @@ export function HomeBanner({onPagePress}: HomeBannerProps) {
 
 const styles = StyleSheet.create({
   container: {
-    height: BANNER_HEIGHT,
     overflow: 'hidden',
   },
   placeholder: {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  placeholderImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
   page: {
-    height: BANNER_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#0a7ea4',
   },
+  pageImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
   pageInner: {
-    justifyContent: 'center',
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
     alignItems: 'center',
+    paddingBottom: 36,
   },
   pageText: {
     color: 'rgba(255,255,255,0.95)',
-    fontSize: 16,
+    fontSize: 14,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: {width: 0, height: 1},
+    textShadowRadius: 2,
   },
   dots: {
     position: 'absolute',

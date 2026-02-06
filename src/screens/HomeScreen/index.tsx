@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {RootStackParamList} from '../../navigation/types';
 import {DateRangeCalendar} from '../../components';
@@ -77,14 +78,16 @@ export function HomeScreen({navigation}: Props) {
     return Math.max(0, Math.round((b - a) / (24 * 60 * 60 * 1000)));
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}>
-      {/* 顶部 Banner：8 页可滚动，圆点指示器 */}
-      <HomeBanner onPagePress={onBannerPagePress} />
+      {/* 广告区从屏幕最顶部开始，图片延伸到状态栏/灵动岛下，连为一体 */}
+      <HomeBanner topInset={insets.top} onPagePress={onBannerPagePress} />
 
       {/* 核心查询区域 */}
       <View style={styles.card}>

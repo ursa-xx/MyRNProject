@@ -22,7 +22,7 @@ export function AppNavigator() {
       <Stack.Screen
         name="Home"
         component={HomeScreen}
-        options={{title: '酒店查询'}}
+        options={{headerShown: false}}
       />
       <Stack.Screen
         name="HotelList"
