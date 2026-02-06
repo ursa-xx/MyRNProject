@@ -62,9 +62,19 @@ export function HomeScreen({navigation}: Props) {
     });
   };
 
-  const formatDisplayDate = (ymd: string) => {
-    const [y, m, d] = ymd.split('-');
-    return `${m}月${d}日`;
+  const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+  const formatDateParts = (ymd: string) => {
+    const [y, m, d] = ymd.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    const weekday = WEEKDAYS[date.getDay()];
+    return { month: m, day: d, weekday };
+  };
+
+  const getNights = (start: string, end: string) => {
+    const a = new Date(start).getTime();
+    const b = new Date(end).getTime();
+    return Math.max(0, Math.round((b - a) / (24 * 60 * 60 * 1000)));
   };
 
   return (
@@ -105,16 +115,38 @@ export function HomeScreen({navigation}: Props) {
           />
         </View>
 
-        {/* 入住 / 离店日期：点击打开日历 */}
+        {/* 入住/离店日期：点击打开日历，日期用分段样式（数字加粗、星期小字、共X晚） */}
         <TouchableOpacity style={styles.dateRowWrap} onPress={openCalendar}>
-          <Text style={styles.dateLabel}>入住 / 离店</Text>
-          <Text style={styles.dateValue}>
-            {checkIn && checkOut
-              ? `${formatDisplayDate(checkIn)} — ${formatDisplayDate(checkOut)}`
-              : checkIn
-                ? `${formatDisplayDate(checkIn)} — 请选离店`
-                : '请选择入住与离店日期'}
-          </Text>
+          <View style={styles.dateValueWrap}>
+            {!checkIn ? (
+              <Text style={styles.datePlaceholder}>请选择入住与离店日期</Text>
+            ) : (
+              <>
+                <View style={styles.datePart}>
+                  <Text style={styles.dateMonth}>{formatDateParts(checkIn).month}月</Text>
+                  <Text style={styles.dateDay}>{formatDateParts(checkIn).day}</Text>
+                  <Text style={styles.dateDaySuffix}>日 </Text>
+                  <Text style={styles.dateWeekday}>{formatDateParts(checkIn).weekday}</Text>
+                </View>
+                <Text style={styles.dateSep}> — </Text>
+                {checkOut ? (
+                  <>
+                    <View style={styles.datePart}>
+                      <Text style={styles.dateMonth}>{formatDateParts(checkOut).month}月</Text>
+                      <Text style={styles.dateDay}>{formatDateParts(checkOut).day}</Text>
+                      <Text style={styles.dateDaySuffix}>日 </Text>
+                      <Text style={styles.dateWeekday}>{formatDateParts(checkOut).weekday}</Text>
+                    </View>
+                    <View style={styles.dateNightsWrap}>
+                      <Text style={styles.dateNights}>共{getNights(checkIn, checkOut)}晚</Text>
+                    </View>
+                  </>
+                ) : (
+                  <Text style={styles.datePlaceholder}>请选离店</Text>
+                )}
+              </>
+            )}
+          </View>
         </TouchableOpacity>
 
         {/* 筛选：星级、价格 */}
@@ -165,12 +197,12 @@ export function HomeScreen({navigation}: Props) {
             ))}
           </ScrollView>
         </View>
-      </View>
 
-      {/* 查询按钮 */}
-      <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
-        <Text style={styles.searchBtnText}>查询酒店</Text>
-      </TouchableOpacity>
+        {/* 查询按钮 */}
+        <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
+          <Text style={styles.searchBtnText}>查询</Text>
+        </TouchableOpacity>
+      </View>
 
       <DateRangeCalendar
         visible={calendarVisible}
@@ -193,10 +225,20 @@ const styles = StyleSheet.create({
   },
   card: {
     marginHorizontal: 16,
-    marginTop: 16,
-    padding: 16,
+    marginTop: -20,
+    paddingTop: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 6,
   },
   row: {
     flexDirection: 'row',
@@ -250,10 +292,53 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
-  dateValue: {
+  dateValueWrap: {
     flex: 1,
-    fontSize: 14,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+  },
+  datePart: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  dateMonth: {
+    fontSize: 18,
+    fontWeight: '700',
     color: '#333',
+  },
+  dateDay: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  dateDaySuffix: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  dateWeekday: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 2,
+  },
+  dateSep: {
+    fontSize: 14,
+    color: '#666',
+    marginHorizontal: 2,
+  },
+  dateNightsWrap: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  dateNights: {
+    fontSize: 14,
+    color: '#666',
+  },
+  datePlaceholder: {
+    fontSize: 14,
+    color: '#999',
   },
   section: {
     marginBottom: 16,
@@ -309,9 +394,9 @@ const styles = StyleSheet.create({
   },
   searchBtn: {
     height: 48,
-    marginHorizontal: 16,
-    marginTop: 24,
-    borderRadius: 12,
+    marginTop: 20,
+    marginHorizontal: 0,
+    borderRadius: 10,
     backgroundColor: '#0a7ea4',
     justifyContent: 'center',
     alignItems: 'center',

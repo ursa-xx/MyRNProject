@@ -186,9 +186,6 @@ export function HomeBanner({onPagePress}: HomeBannerProps) {
 const styles = StyleSheet.create({
   container: {
     height: BANNER_HEIGHT,
-    marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 12,
     overflow: 'hidden',
   },
   placeholder: {
@@ -212,7 +209,7 @@ const styles = StyleSheet.create({
   dots: {
     position: 'absolute',
     right: 12,
-    bottom: 10,
+    bottom: 28,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
