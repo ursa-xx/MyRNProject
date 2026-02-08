@@ -17,19 +17,21 @@ import {
 
 const PAGE_COUNT = 8;
 
-/** assets 下 8 张 Banner 图，与 8 页一一对应（HomeBanner 在 src/.../components/HomeBanner，需回退 4 层到 src/assets） */
+/** assets 下 8 张 Banner 图，与 8 页一一对应；contain 在视口内完整展示整图 */
 const BANNER_IMAGES: ImageSourcePropType[] = [
-  require('../../../../assets/0c40cc52cdea8bf588bfa1217df1a30f.jpg'),
-  require('../../../../assets/1f5fe7748dacca130b066f7176db3992.jpg'),
-  require('../../../../assets/88403195b0830bd40c73d9f5cb213f52.jpg'),
-  require('../../../../assets/a02a6b0f175ddfa34aca21abf04b6e2e.jpg'),
-  require('../../../../assets/b36b9c7c3718fb4aa87ab27c2a8cd32b.jpg'),
-  require('../../../../assets/b81178921b5140cecc5f3c877ddba62a.jpg'),
-  require('../../../../assets/ef00d57d27b07a283e336ceb3a85f7ed.jpg'),
-  require('../../../../assets/fd2e8d22fe4143e7c67314dd6d95c6bb.jpg'),
+  require('../../../../assets/061e765af00aed68b4bc8b7b48521880.png'),
+  require('../../../../assets/476ad7485e916d476754c7335b9dc9c5.png'),
+  require('../../../../assets/74a3319e1d6c307de15719d242783fb6.png'),
+  require('../../../../assets/775d1fda034c7dd64452650d40e35b62.png'),
+  require('../../../../assets/8f7861e1678e908b8ce8a251ba90a0b1.png'),
+  require('../../../../assets/cab5ecb98505cf4facf55546d191d2a5.png'),
+  require('../../../../assets/d7acef45e189aabd5e4f1f9d4989e0b1.png'),
+  require('../../../../assets/f4db93066e3a9ea940bcc848b8874e42.png'),
 ];
 const TOTAL_SLIDES = PAGE_COUNT + 1; // 多一页作为“第一页”的副本，实现最后一页左滑进第一页
-const BANNER_HEIGHT = 140;
+/** 宽高比 2:1（宽/高），Banner 高度 = 宽度/2，图片同比例时 cover 刚好铺满无裁切 */
+const BANNER_ASPECT_RATIO = 2;
+const BANNER_HEIGHT_FALLBACK = 180; // layoutWidth 未量到时的默认内容区高度
 const AUTO_PLAY_INTERVAL = 3000;
 
 export type HomeBannerProps = {
@@ -39,8 +41,10 @@ export type HomeBannerProps = {
 };
 
 export function HomeBanner({topInset = 0, onPagePress}: HomeBannerProps) {
-  const bannerHeight = BANNER_HEIGHT + topInset;
   const [layoutWidth, setLayoutWidth] = useState(0);
+  const contentHeight =
+    layoutWidth > 0 ? layoutWidth / BANNER_ASPECT_RATIO : BANNER_HEIGHT_FALLBACK;
+  const bannerHeight = topInset + contentHeight;
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -148,7 +152,11 @@ export function HomeBanner({topInset = 0, onPagePress}: HomeBannerProps) {
   if (layoutWidth <= 0) {
     return (
       <View
-        style={[styles.container, styles.placeholder, {height: bannerHeight}]}
+        style={[
+          styles.container,
+          styles.placeholder,
+          {height: topInset + BANNER_HEIGHT_FALLBACK},
+        ]}
         onLayout={onLayout}>
         <Image
           source={BANNER_IMAGES[0]}

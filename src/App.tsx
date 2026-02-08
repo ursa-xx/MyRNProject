@@ -10,7 +10,7 @@ import {AppNavigator} from './navigation/AppNavigator';
 export default function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor="#0a7ea4" />
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <NavigationContainer
         onReady={() => {
           if (__DEV__) {

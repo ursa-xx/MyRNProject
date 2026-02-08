@@ -86,7 +86,7 @@ export function HomeScreen({navigation}: Props) {
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}>
-      {/* 广告区从屏幕最顶部开始，图片延伸到状态栏/灵动岛下，连为一体 */}
+      {/* 广告区从屏幕最顶开始，总高 = 状态栏高 + 140，图片铺满整块，与灵动岛上方连为一体且面积不变 */}
       <HomeBanner topInset={insets.top} onPagePress={onBannerPagePress} />
 
       {/* 核心查询区域 */}
