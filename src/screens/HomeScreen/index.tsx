@@ -12,10 +12,11 @@ import {
   ScrollView,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Ionicons} from '@expo/vector-icons';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {RootStackParamList} from '../../navigation/types';
 import {DateRangeCalendar} from '../../components';
-import {HomeBanner} from './components';
+import {HomeBanner, ProvincePicker} from './components';
 import {BANNER_HOTEL_ID, QUICK_TAGS, STAR_OPTIONS, PRICE_OPTIONS} from './constants';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -29,6 +30,7 @@ export function HomeScreen({navigation}: Props) {
   const [priceRange, setPriceRange] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [calendarVisible, setCalendarVisible] = useState(false);
+  const [provinceModalVisible, setProvinceModalVisible] = useState(false);
 
   const onBannerPagePress = () => {
     navigation.navigate('HotelDetail', {hotelId: BANNER_HOTEL_ID});
@@ -93,16 +95,22 @@ export function HomeScreen({navigation}: Props) {
       <View style={styles.card}>
         {/* 当前地点 + 定位 */}
         <View style={styles.row}>
-          <Text style={styles.label}>当前地点</Text>
+          <TouchableOpacity
+            style={styles.labelWithArrow}
+            onPress={() => setProvinceModalVisible(true)}
+            activeOpacity={0.7}>
+            <Text style={styles.label}>当前地点 </Text>
+            <Text style={styles.arrowDown}>▼</Text>
+          </TouchableOpacity>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { marginLeft: 5}]}
             placeholder="请输入或选择当前地点"
             placeholderTextColor="#999"
             value={location}
             onChangeText={setLocation}
           />
           <TouchableOpacity style={styles.locationBtn} onPress={onUseLocation}>
-            <Text style={styles.locationBtnText}>定位</Text>
+            <Ionicons name="location" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -214,6 +222,15 @@ export function HomeScreen({navigation}: Props) {
         checkOut={checkOut}
         onSelect={handleDateSelect}
       />
+
+      <ProvincePicker
+        visible={provinceModalVisible}
+        onClose={() => setProvinceModalVisible(false)}
+        onSelect={province => {
+          setLocation(province);
+          setProvinceModalVisible(false);
+        }}
+      />
     </ScrollView>
   );
 }
@@ -248,8 +265,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  label: {
+  labelWithArrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     width: 72,
+  },
+  arrowDown: {
+    fontSize: 10,
+    color: '#666',
+    marginRight: 4,
+  },
+  label: {
     fontSize: 14,
     color: '#333',
   },
@@ -271,13 +297,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     height: 40,
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#0a7ea4',
     borderRadius: 8,
-  },
-  locationBtnText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
   dateRowWrap: {
     flexDirection: 'row',
